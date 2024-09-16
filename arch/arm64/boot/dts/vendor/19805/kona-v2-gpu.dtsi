@@ -110,7 +110,7 @@
 			};
 
 			qcom,gpu-pwrlevel@3 {
-				reg = <23;
+				reg = <3;
 				qcom,gpu-freq = <490000000>;
 				qcom,bus-freq-ddr7 = <9>;
 				qcom,bus-min-ddr7 = <6>;
