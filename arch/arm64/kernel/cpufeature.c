@@ -1206,7 +1206,7 @@ static void cpu_enable_ssbs(const struct arm64_cpu_capabilities *__unused)
 
 static void user_feature_fixup(void)
 {
-	if (cpus_have_cap(ARM64_SSBS)) {
+	if (cpus_have_cap(ARM64_WORKAROUND_SPECULATIVE_SSBS)) {
 		struct arm64_ftr_reg *regp;
 
 		regp = get_arm64_ftr_reg(SYS_ID_AA64PFR1_EL1);

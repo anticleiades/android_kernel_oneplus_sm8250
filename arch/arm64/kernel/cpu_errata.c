@@ -678,6 +678,18 @@ needs_tx2_tvm_workaround(const struct arm64_cpu_capabilities *entry,
 	return false;
 }
 
+#ifdef CONFIG_ARM64_ERRATUM_1542418
+static void run_workaround_1542418_asid_rollover(const struct arm64_cpu_capabilities *c)
+{
+	/*
+	 * If this CPU is affected by the erratum, run the workaround
+	 * to protect us in case we are running on a kexec'ed kernel.
+	 */
+	if (c->matches(c, SCOPE_LOCAL_CPU))
+		arm64_workaround_1542418_asid_rollover();
+}
+#endif
+
 static bool __maybe_unused
 has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
 				int scope)
@@ -965,6 +977,14 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.matches = needs_tx2_tvm_workaround,
 	},
 #endif
+#ifdef CONFIG_ARM64_ERRATUM_1542418
+	{
+		.desc = "ARM erratum 1542418",
+		.capability = ARM64_WORKAROUND_1542418,
+		ERRATA_MIDR_RANGE(MIDR_CORTEX_A77, 0, 0, 1, 0),
+		.cpu_enable = run_workaround_1542418_asid_rollover,
+	},
+#endif
 #ifdef CONFIG_ARM64_ERRATUM_1542419
 	{
 		/* we depend on the firmware portion for correctness */
@@ -986,7 +1006,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 #ifdef CONFIG_ARM64_ERRATUM_3194386
 	{
 		.desc = "SSBS not fully self-synchronizing",
-		.capability = ARM64_SSBS,
+		.capability = ARM64_WORKAROUND_SPECULATIVE_SSBS,
 		ERRATA_MIDR_RANGE_LIST(erratum_spec_ssbs_list),
 	},
 #endif
