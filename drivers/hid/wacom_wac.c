@@ -1830,13 +1830,11 @@ static void wacom_map_usage(struct input_dev *input, struct hid_usage *usage,
 	int fmax = field->logical_maximum;
 	unsigned int equivalent_usage = wacom_equivalent_usage(usage->hid);
 	int resolution_code = code;
-	int resolution;
+	int resolution = hidinput_calc_abs_res(field, resolution_code);
 
 	if (equivalent_usage == HID_DG_TWIST) {
 		resolution_code = ABS_RZ;
 	}
-
-	resolution = hidinput_calc_abs_res(field, resolution_code);
 
 	if (equivalent_usage == HID_GD_X) {
 		fmin += features->offset_left;
