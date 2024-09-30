@@ -12,7 +12,6 @@
 #include <linux/rhashtable.h>
 #include <net/netfilter/nf_flow_table.h>
 #include <net/netlink.h>
-#include <net/netns/generic.h>
 
 #define NFT_JUMP_STACK_SIZE	16
 
@@ -637,16 +636,10 @@ static inline struct nft_expr *nft_set_ext_expr(const struct nft_set_ext *ext)
 	return nft_set_ext(ext, NFT_SET_EXT_EXPR);
 }
 
-static inline bool __nft_set_elem_expired(const struct nft_set_ext *ext,
-					  u64 tstamp)
-{
-	return nft_set_ext_exists(ext, NFT_SET_EXT_EXPIRATION) &&
-	       time_after_eq64(tstamp, *nft_set_ext_expiration(ext));
-}
-
 static inline bool nft_set_elem_expired(const struct nft_set_ext *ext)
 {
-	return __nft_set_elem_expired(ext, get_jiffies_64());
+	return nft_set_ext_exists(ext, NFT_SET_EXT_EXPIRATION) &&
+	       time_is_before_eq_jiffies64(*nft_set_ext_expiration(ext));
 }
 
 static inline struct nft_set_ext *nft_set_elem_ext(const struct nft_set *set,
@@ -1430,20 +1423,10 @@ struct nftables_pernet {
 	struct list_head	module_list;
 	struct list_head	notify_list;
 	struct mutex		commit_mutex;
-	u64			tstamp;
 	unsigned int		base_seq;
 	u8			validate_state;
 	unsigned int		gc_seq;
 };
-
-extern unsigned int nf_tables_net_id;
-
-static inline u64 nft_net_tstamp(const struct net *net)
-{
-	struct nftables_pernet *nft_net = net_generic(net, nf_tables_net_id);
-
-	return nft_net->tstamp;
-}
 
 int nf_msecs_to_jiffies64(const struct nlattr *nla, u64 *result);
 __be64 nf_jiffies64_to_msecs(u64 input);
