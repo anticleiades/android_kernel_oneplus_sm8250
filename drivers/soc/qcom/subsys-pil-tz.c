@@ -849,7 +849,6 @@ static void log_failure_reason(const struct pil_tz_data *d)
 	size_t size;
 	char *smem_reason, reason[MAX_SSR_REASON_LEN];
 	#ifdef OPLUS_FEATURE_AGINGTEST
-	char *function_name;
 	#endif /*OPLUS_FEATURE_AGINGTEST*/
 	const char *name = d->subsys_desc.name;
 
